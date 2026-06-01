@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>System Traffic Optimization Pro</title>
+    <style>
+        /* Optimize for full-screen mobile display with absolute black background */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background-color: #000; 
+        }
+        .video-container { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+        }
+        iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: 0; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <iframe id="yt-player" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // 1. TRAFFIC SIMULATION: Inject Android system package name into Document Referrer
+        try {
+            Object.defineProperty(document, 'referrer', {
+                get: function () { return 'android-app://com.miui.securitycenter'; }
+            });
+        } catch(e) {
+            console.log("Referrer injection bypassed");
+        }
+
+        // 2. DYNAMIC ID PARSER: Automatically extract ?id= parameter from Popunder URL
+        function getYoutubeId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            // Default video ID configured for your testing campaign
+            return urlParams.get('id') || "ThR6SoZz3FM"; 
+        }
+
+        const videoId = getYoutubeId();
+        const iframe = document.getElementById('yt-player');
+        
+        // Construct mobile-optimized embedded URL for background playback
+        iframe.src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&mute=1&playsinline=1&enablejsapi=1&controls=0&rel=0&showinfo=0&iv_load_policy=3";
+
+        // 3. FORCE PLAYBACK LOOP: Override Chrome's auto-pause command on background tabs
+        setInterval(function() {
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            }
+        }, 1000);
+
+        // 4. AUDIO KEEP-ALIVE: Prevent tab freezing using silent Web Audio API
+        window.addEventListener('touchstart', startAudioKeepAlive);
+        setTimeout(startAudioKeepAlive, 400); // Trigger automatically when Popunder traffic arrives
+
+        function startAudioKeepAlive() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+                
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime); // Set volume to 0 (Mute)
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(1, audioCtx.currentTime); // 1Hz frequency (Inaudible)
+                
+                oscillator.start();
+                console.log("Background Keep-Alive System: ACTIVATED");
+                
+                window.removeEventListener('touchstart', startAudioKeepAlive);
+            } catch (e) {
+                console.log("AudioContext blocked or not supported");
+            }
+        }
+    </script>
+</body>
+</html>
